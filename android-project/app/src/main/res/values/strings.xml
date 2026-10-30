@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_name">SmartPay Sound Box</string>
+    <string name="notification_listener_service_name">SmartPay Payment Listener</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Dashboard -->
+    <string name="today_detected_total">Today\'s Detected Total</string>
+    <string name="this_month_total">This Month</string>
+    <string name="sound_announcement_lang">Voice Language</string>
+    <string name="recent_transactions_title">Recent Detected Payments</string>
+    <string name="view_all_history">View All</string>
+    <string name="no_transactions_yet">No detected payments yet. Send a test sound or generate a demo transaction.</string>
+
+    <!-- Payment Safety Disclaimers -->
+    <string name="status_detected_not_bank_verified">Detected — Not Bank Verified</string>
+    <string name="safety_disclaimer_desc">Notification detection does not confirm that funds have settled into your merchant bank account. Always verify high-value payments via your official banking app.</string>
+
+    <!-- Permission -->
+    <string name="permission_required_title">Notification Access Required</string>
+    <string name="permission_required_desc">SmartPay Sound Box requires Notification Access permission to detect incoming UPI payment alerts and announce amounts aloud.</string>
+    <string name="btn_grant_notification_access">Grant Notification Access</string>
+
+    <!-- Actions -->
+    <string name="btn_test_sound">Test Sound</string>
+    <string name="btn_sample_demo">Add Sample Demo</string>
+    <string name="btn_clear_all">Clear All</string>
+    <string name="btn_clear_demo_txns">Clear Demo Txns</string>
+    <string name="btn_delete_all">Delete All</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_close">Close</string>
+
+    <!-- History Screen -->
+    <string name="search_transactions_hint">Search sender, app, or amount…</string>
+    <string name="no_matching_transactions">No matching transactions found.</string>
+    <string name="confirm_clear_title">Clear Transaction History?</string>
+    <string name="confirm_clear_desc">This will permanently delete all stored payment notification records from this device.</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_section_languages">Language Settings</string>
+    <string name="display_language_title">Display Language</string>
+    <string name="announcement_voice_language_title">Voice Announcement Language</string>
+    <string name="select_display_language">Select Display Language</string>
+    <string name="select_announcement_language">Select Voice Language</string>
+
+    <string name="settings_section_speech">Voice &amp; Announcement Controls</string>
+    <string name="speech_rate_label">Speech Speed Rate</string>
+    <string name="chime_sound_label">Hardware Sound Box Chime</string>
+    <string name="chime_sound_desc">Play classic alert beep before speaking amount</string>
+
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="theme_dark_mode_title">Futuristic Dark Mode</string>
+    <string name="theme_dark_mode_desc">High-contrast emerald neon for daytime shop legibility</string>
+
+    <string name="supported_upi_apps_title">Supported UPI Applications</string>
+</resources>

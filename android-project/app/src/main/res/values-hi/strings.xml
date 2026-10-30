@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">SmartPay साउंड बॉक्स</string>
+    <string name="notification_listener_service_name">SmartPay भुगतान श्रोता</string>
+
+    <string name="nav_home">होम</string>
+    <string name="nav_history">इतिहास</string>
+    <string name="nav_settings">सेटिंग्स</string>
+
+    <string name="today_detected_total">आज का कुल भुगतान</string>
+    <string name="this_month_total">इस महीने</string>
+    <string name="sound_announcement_lang">आवाज की भाषा</string>
+    <string name="recent_transactions_title">हाल ही में प्राप्त भुगतान</string>
+    <string name="view_all_history">सभी देखें</string>
+    <string name="no_transactions_yet">अभी तक कोई भुगतान नहीं मिला है।</string>
+
+    <string name="status_detected_not_bank_verified">पहचाना गया — बैंक द्वारा सत्यापित नहीं</string>
+    <string name="safety_disclaimer_desc">अधिसूचना मिलना इस बात का प्रमाण नहीं है कि पैसा बैंक खाते में आ गया है।</string>
+
+    <string name="permission_required_title">अधिसूचना अनुमति आवश्यक है</string>
+    <string name="permission_required_desc">UPI भुगतान सूचनाओं का पता लगाने और आवाज में बोलने के लिए अनुमति आवश्यक है।</string>
+    <string name="btn_grant_notification_access">अनुमति प्रदान करें</string>
+
+    <string name="btn_test_sound">आवाज का परीक्षण करें</string>
+    <string name="btn_sample_demo">नमूना लेनदेन जोड़ें</string>
+    <string name="btn_clear_all">सब साफ करें</string>
+    <string name="btn_clear_demo_txns">डेमो लेनदेन हटाएं</string>
+    <string name="btn_delete_all">सभी हटाएं</string>
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="btn_close">बंद करें</string>
+
+    <string name="search_transactions_hint">भेजने वाले या राशि से खोजें…</string>
+    <string name="no_matching_transactions">कोई मेल खाता लेनदेन नहीं मिला।</string>
+    <string name="confirm_clear_title">लेनदेन इतिहास साफ करें?</string>
+    <string name="confirm_clear_desc">यह इस डिवाइस से सभी सहेजे गए भुगतान रिकॉर्ड को स्थायी रूप से हटा देगा।</string>
+
+    <string name="settings_section_languages">भाषा सेटिंग्स</string>
+    <string name="display_language_title">प्रदर्शन भाषा</string>
+    <string name="announcement_voice_language_title">घोषणा आवाज भाषा</string>
+    <string name="select_display_language">भाषा चुनें</string>
+    <string name="select_announcement_language">आवाज भाषा चुनें</string>
+
+    <string name="settings_section_speech">ध्वनि और भाषण नियंत्रण</string>
+    <string name="speech_rate_label">बोलने की गति</string>
+    <string name="chime_sound_label">साउंड बॉक्स बीप घंटी</string>
+    <string name="chime_sound_desc">राशि बोलने से पहले बीप की आवाज बजाएं</string>
+
+    <string name="settings_section_appearance">दिखावट</string>
+    <string name="theme_dark_mode_title">डार्क मोड</string>
+    <string name="theme_dark_mode_desc">दुकान के लिए उच्च-विपरीत दृश्य</string>
+
+    <string name="supported_upi_apps_title">समर्थित UPI ऍप्लिकेशन्स</string>
+</resources>

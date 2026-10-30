@@ -1,0 +1,6 @@
+{
+  "name": "SAP DRM Digital Management System",
+  "description": "Enterprise automotive-grade DRM Digital Management System with real-time indicator tracking, SAP report ingestion, Google Apps Script & Google Drive architecture, and executive analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

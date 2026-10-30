@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay সাউন্দ বোক্স</string>
+    <string name="nav_home">য়ুম</string>
+    <string name="nav_history">ৱারী</string>
+    <string name="nav_settings">সেতিংস</string>
+    <string name="today_detected_total">ঙসিগী অপুনবা শেনফম</string>
+    <string name="this_month_total">থা অসিদা</string>
+    <string name="sound_announcement_lang">খোন্থোক্কী লোন</string>
+    <string name="recent_transactions_title">হন্দক্কী পেমেন্তশিং</string>
+    <string name="status_detected_not_bank_verified">উবা ফংলে — বেঙ্কনা ভেরিফাই তৌদ্রিবা</string>
+    <string name="btn_test_sound">খোঞ্জেল চাংয়েং তৌবা</string>
+    <string name="btn_sample_demo">দেমো ত্রান্সেক্সন হাপচিনবা</string>
+</resources>

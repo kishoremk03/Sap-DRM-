@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay ध्वनिपेटी</string>
+    <string name="nav_home">गृहम्</string>
+    <string name="nav_history">इतिहासः</string>
+    <string name="nav_settings">विन्यासाः</string>
+    <string name="today_detected_total">अद्यतनं प्राप्तधनम्</string>
+    <string name="this_month_total">अस्मिन् मासे</string>
+    <string name="sound_announcement_lang">ध्वनिभाषा</string>
+    <string name="recent_transactions_title">नूतनव्यवहाराः</string>
+    <string name="status_detected_not_bank_verified">प्राप्तसूचना — अधिकोशप्रमाणीकरणं नास्ति</string>
+    <string name="btn_test_sound">ध्वनिपरीक्षणम्</string>
+    <string name="btn_sample_demo">प्रदर्शनव्यवहारः योज्यताम्</string>
+</resources>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay চাউণ্ড বক্স</string>
+    <string name="nav_home">গৃহ</string>
+    <string name="nav_history">ইতিহাস</string>
+    <string name="nav_settings">ছেটিংছ</string>
+    <string name="today_detected_total">আজিৰ চিনাক্তকৃত মুঠ</string>
+    <string name="this_month_total">এই মাহ</string>
+    <string name="sound_announcement_lang">কণ্ঠৰ ভাষা</string>
+    <string name="recent_transactions_title">শেহতীয়া লেনদেন</string>
+    <string name="status_detected_not_bank_verified">চিনাক্ত হৈছে — বেংক দ্বাৰা প্ৰমাণিত নহয়</string>
+    <string name="btn_test_sound">শব্দ পৰীক্ষা</string>
+    <string name="btn_sample_demo">নমুনা লেনদেন যোগ কৰক</string>
+</resources>

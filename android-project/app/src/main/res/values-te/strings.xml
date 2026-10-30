@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay సౌండ్ బాక్స్</string>
+    <string name="nav_home">హోమ్</string>
+    <string name="nav_history">చరిత్ర</string>
+    <string name="nav_settings">సెట్టింగ్‌లు</string>
+    <string name="today_detected_total">ఈరోజు గుర్తించిన మొత్తం</string>
+    <string name="this_month_total">ఈ నెల</string>
+    <string name="sound_announcement_lang">వాయిస్ భాష</string>
+    <string name="recent_transactions_title">ఇటీవలి చెల్లింపులు</string>
+    <string name="status_detected_not_bank_verified">గుర్తించబడింది — బ్యాంకు ద్వారా ధృవీకరించబడలేదు</string>
+    <string name="btn_test_sound">ధ్వనిని పరీక్షించండి</string>
+    <string name="btn_sample_demo">నమూనా లావాదేవీని జోడించండి</string>
+</resources>

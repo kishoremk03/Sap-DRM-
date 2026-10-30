@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay ସାଉଣ୍ଡ ବକ୍ସ</string>
+    <string name="nav_home">ମୂଳପୃଷ୍ଠା</string>
+    <string name="nav_history">ଇତିହାସ</string>
+    <string name="nav_settings">ସେଟିଂସମୂହ</string>
+    <string name="today_detected_total">ଆଜିର ମୋଟ ଆଦାୟ</string>
+    <string name="this_month_total">ଏହି ମାସ</string>
+    <string name="sound_announcement_lang">ସ୍ୱର ଭାଷା</string>
+    <string name="recent_transactions_title">ସାମ୍ପ୍ରତିକ ପେମେଣ୍ଟ</string>
+    <string name="status_detected_not_bank_verified">ଚିହ୍ନଟ ହୋଇଛି — ବ୍ୟାଙ୍କ ଦ୍ୱାରା ଯାଞ୍ଚ ହୋଇନାହିଁ</string>
+    <string name="btn_test_sound">ଶବ୍ଦ ପରୀକ୍ଷା</string>
+    <string name="btn_sample_demo">ନମୁନା କାରବାର ଯୋଡନ୍ତୁ</string>
+</resources>

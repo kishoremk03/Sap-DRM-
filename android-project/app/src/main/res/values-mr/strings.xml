@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay साउंड बॉक्स</string>
+    <string name="nav_home">मुख्यपृष्ठ</string>
+    <string name="nav_history">इतिहास</string>
+    <string name="nav_settings">सेटिंग्ज</string>
+    <string name="today_detected_total">आजचे एकूण पेमेंट</string>
+    <string name="this_month_total">या महिन्यात</string>
+    <string name="sound_announcement_lang">आवाज भाषा</string>
+    <string name="recent_transactions_title">अलीकडील पेमेंट्स</string>
+    <string name="status_detected_not_bank_verified">शोधले — बँकेने पडताळलेले नाही</string>
+    <string name="btn_test_sound">आवाज चाचणी</string>
+    <string name="btn_sample_demo">नमुना व्यवहार जोडा</string>
+</resources>

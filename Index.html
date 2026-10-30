@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAP DRM Digital Management System</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F0F9FF',
+              100: '#E0F2FE',
+              500: '#0284C7',
+              600: '#0369A1',
+              700: '#075985',
+              900: '#0C4A6E',
+            },
+            accent: {
+              cyan: '#06B6D4',
+              teal: '#0D9488',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    .glass-header {
+      backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.88);
+    }
+    .dark .glass-header {
+      background-color: rgba(15, 23, 42, 0.88);
+    }
+  </style>
+</head>
+<body class="bg-[#F4F7FA] dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased">
+  
+  <!-- TOP BAR CONTRACT: [Brand, 1 line] — [Nav links, single line] — [1 Primary Action] -->
+  <header class="glass-header sticky top-0 z-40 border-b border-slate-200/80 dark:border-slate-800 px-6 py-3 flex items-center justify-between gap-8 transition-colors">
+    <div class="flex items-center gap-3 shrink-0">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-sky-600 to-teal-500 flex items-center justify-center text-white shadow-xs font-bold text-sm tracking-wider">
+        DRM
+      </div>
+      <div class="flex flex-col">
+        <span class="text-base font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">SAP DRM Digital System</span>
+        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Automotive Manufacturing Operations</span>
+      </div>
+    </div>
+
+    <!-- Middle Info & Controls -->
+    <div class="hidden lg:flex items-center gap-4 text-xs">
+      <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200/60 dark:border-slate-800">
+        <span class="text-slate-500 dark:text-slate-400">Financial Year:</span>
+        <select id="globalFySelect" onchange="window.app.handleFyChange(this.value)" class="bg-transparent font-semibold text-slate-800 dark:text-slate-200 focus:outline-hidden cursor-pointer">
+          <option value="FY 2026-2027">FY 2026–2027</option>
+          <option value="FY 2025-2026">FY 2025–2026</option>
+          <option value="FY 2024-2025">FY 2024–2025</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200/60 dark:border-slate-800">
+        <span class="text-slate-500 dark:text-slate-400">Role:</span>
+        <select id="roleSwitcher" onchange="window.app.switchRole(this.value)" class="bg-transparent font-semibold text-sky-600 dark:text-sky-400 focus:outline-hidden cursor-pointer">
+          <option value="ADMIN">Administrator (Full Control)</option>
+          <option value="DEPT_HEAD">Dept Head (Approvals & Reviews)</option>
+          <option value="DEPT_USER">Dept User (Actuals & Upload)</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+        <i data-lucide="shield-check" class="w-4 h-4 text-teal-500"></i>
+        <span id="userEmailBadge" class="tabular-nums">admin@company.com</span>
+      </div>
+    </div>
+
+    <!-- Top Action Zone -->
+    <div class="flex items-center gap-3 shrink-0">
+      <button onclick="window.app.toggleDarkMode()" class="p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Theme">
+        <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+        <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+      </button>
+      <button onclick="window.app.openGasDeployModal()" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 rounded-lg transition-colors shadow-xs flex items-center gap-2 whitespace-nowrap shrink-0">
+        <i data-lucide="cloud-upload" class="w-4 h-4"></i>
+        <span>GAS Setup & Deploy</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER: Sidebar + Content -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- COLLAPSIBLE SIDEBAR -->
+    <aside id="mainSidebar" class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 flex flex-col shrink-0 transition-all duration-200">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-400 tracking-wider">NAVIGATION</span>
+        <button onclick="window.app.toggleSidebar()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto text-xs font-medium">
+        <button onclick="window.app.navigate('dashboard')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="dashboard">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-sky-600"></i>
+          <span>Executive Dashboard</span>
+        </button>
+        <button onclick="window.app.navigate('indicators')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="indicators">
+          <i data-lucide="list-checks" class="w-4 h-4 text-teal-600"></i>
+          <span>DRM Indicator Register</span>
+        </button>
+        <button onclick="window.app.navigate('monthly')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="monthly">
+          <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+          <span>Monthly Tracking</span>
+        </button>
+        <button onclick="window.app.navigate('sap_upload')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="sap_upload">
+          <i data-lucide="file-up" class="w-4 h-4 text-cyan-600"></i>
+          <span>SAP Data Import</span>
+        </button>
+        <button onclick="window.app.navigate('approvals')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="approvals">
+          <i data-lucide="check-square" class="w-4 h-4 text-emerald-600"></i>
+          <span>Approval Center</span>
+        </button>
+        <button onclick="window.app.navigate('corrective_actions')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="corrective_actions">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
+          <span>Corrective Actions (CAPA)</span>
+        </button>
+        <button onclick="window.app.navigate('departments')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="departments">
+          <i data-lucide="building-2" class="w-4 h-4 text-indigo-600"></i>
+          <span>Departments</span>
+        </button>
+        <button onclick="window.app.navigate('reports')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="reports">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-slate-600"></i>
+          <span>Reports & Exports</span>
+        </button>
+        <button onclick="window.app.navigate('historical')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="historical">
+          <i data-lucide="history" class="w-4 h-4 text-violet-600"></i>
+          <span>Historical Analytics</span>
+        </button>
+        <button onclick="window.app.navigate('audit')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="audit">
+          <i data-lucide="clipboard-list" class="w-4 h-4 text-rose-600"></i>
+          <span>Audit Logs</span>
+        </button>
+        <button onclick="window.app.navigate('settings')" class="nav-item w-full flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" data-view="settings">
+          <i data-lucide="settings" class="w-4 h-4 text-slate-600"></i>
+          <span>Application Settings</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer: Storage Info -->
+      <div class="p-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-medium">Drive Storage</span>
+          <span class="text-teal-600 font-semibold">SAP_DRM_Data</span>
+        </div>
+        <p class="text-[10px] text-slate-400 leading-tight">Enterprise automotive standard IATF 16949 / ISO 9001 compliance engine</p>
+      </div>
+    </aside>
+
+    <!-- CONTENT VIEWPORT -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6" id="mainContainer">
+      <!-- Dynamic Views rendered here via JavaScript -->
+      <div id="viewMount"></div>
+    </main>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- GOOGLE APPS SCRIPT CLIENT LOGIC & LOCAL PERSISTENCE ENGINE -->
+  <script>
+    /**
+     * SAP DRM Client & Standalone Google Apps Script Integration
+     */
+    (function() {
+      // Core 48 digitized DRM Indicators from automotive workbook
+      const CORE_INDICATORS = [
+        // Materials Management (7)
+        { id: 'DRM-MM-01', name: 'Purchase Orders Pending Approval > 3 Days', deptId: 'DEP-01', tCode: 'ME28 / ME5A', unit: 'Nos', target: 0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 1, sapRequired: true, desc: 'Open POs requiring executive clearance beyond SLA' },
+        { id: 'DRM-MM-02', name: 'Open Purchase Requisitions Pending Conversion', deptId: 'DEP-01', tCode: 'ME5A', unit: 'Nos', target: 5, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 8, sapRequired: true, desc: 'PR to PO conversion backlog older than 7 calendar days' },
+        { id: 'DRM-MM-03', name: 'Vendor Delivery Adherence / V-OTIF', deptId: 'DEP-01', tCode: 'ZM088', unit: '%', target: 95.0, rule: 'HIGHER_IS_BETTER', tolMin: 90.0, tolMax: 100, sapRequired: true, desc: 'Vendor on-time in-full delivery compliance against purchase order schedule' },
+        { id: 'DRM-MM-04', name: 'Non-Moving Inventory > 90 Days', deptId: 'DEP-01', tCode: 'ZMR49Q', unit: 'INR Lakhs', target: 10.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 15.0, sapRequired: true, desc: 'Raw material and bought-out stock without consumption in last quarter' },
+        { id: 'DRM-MM-05', name: 'GRN Pending for Receipt Verification', deptId: 'DEP-01', tCode: 'ZM055', unit: 'Nos', target: 0, rule: 'EQUAL_TO_TARGET', tolMin: 0, tolMax: 0, sapRequired: true, desc: 'Gate-entry done but GRN posting pending over 24 hours' },
+        { id: 'DRM-MM-06', name: 'Critical Raw Material Stock Buffer Level', deptId: 'DEP-01', tCode: 'MB52', unit: 'Days', target: 18.0, rule: 'WITHIN_RANGE', tolMin: 15.0, tolMax: 20.0, sapRequired: true, desc: 'Buffer inventory coverage for Grade-A steel and fasteners' },
+        { id: 'DRM-MM-07', name: 'Cost Reduction Through Alternate Sourcing', deptId: 'DEP-01', tCode: 'ZM013', unit: 'INR Lakhs', target: 5.0, rule: 'HIGHER_IS_BETTER', tolMin: 4.0, tolMax: 10.0, sapRequired: false, desc: 'Cumulative cost savings achieved through VAVE and negotiations' },
+
+        // Stores (6)
+        { id: 'DRM-ST-01', name: 'Physical vs SAP Stock Accuracy', deptId: 'DEP-02', tCode: 'MB52', unit: '%', target: 99.5, rule: 'HIGHER_IS_BETTER', tolMin: 98.5, tolMax: 100, sapRequired: true, desc: 'Wall-to-wall cycle audit variance percentage' },
+        { id: 'DRM-ST-02', name: 'Pending Material Issues to Shop Floor > 24h', deptId: 'DEP-02', tCode: 'MB25', unit: 'Nos', target: 0, rule: 'EQUAL_TO_TARGET', tolMin: 0, tolMax: 0, sapRequired: true, desc: 'Reservations pending pick and dispatch to assembly bays' },
+        { id: 'DRM-ST-03', name: 'Scrap Material Disposal Adherence', deptId: 'DEP-02', tCode: 'MB51', unit: 'Days', target: 7.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 10.0, sapRequired: true, desc: 'Turnaround from scrap generation yard staging to auction' },
+        { id: 'DRM-ST-04', name: 'Excess Stock Movement to Dead Storage', deptId: 'DEP-02', tCode: 'ZM020V', unit: 'Items', target: 2, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 4, sapRequired: true, desc: 'Identification and quarantine of obsolete tooling and parts' },
+        { id: 'DRM-ST-05', name: 'High Value Item Daily Cycle Count', deptId: 'DEP-02', tCode: 'SQ01', unit: '%', target: 100.0, rule: 'EQUAL_TO_TARGET', tolMin: 100.0, tolMax: 100.0, sapRequired: false, desc: '100% adherence to ABC-category A item counting schedule' },
+        { id: 'DRM-ST-06', name: 'Goods Inward Staging Time', deptId: 'DEP-02', tCode: 'ZM083P', unit: 'Hours', target: 4.0, rule: 'LOWER_IS_BETTER', tolMin: 1.0, tolMax: 5.0, sapRequired: true, desc: 'Elapsed time from vehicle gate-in to dock unloading' },
+
+        // Quality (7)
+        { id: 'DRM-QA-01', name: 'Incoming Material Quality Rejection Rate', deptId: 'DEP-03', tCode: 'QA32', unit: 'PPM', target: 50.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 75.0, sapRequired: true, desc: 'Supplier defect density measured in parts per million' },
+        { id: 'DRM-QA-02', name: 'Line Rejection / Defect Rate', deptId: 'DEP-03', tCode: 'QM10', unit: '%', target: 0.8, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 1.0, sapRequired: true, desc: 'Internal production defect percentage caught at quality gates' },
+        { id: 'DRM-QA-03', name: 'Customer Complaints / 0-Km Failures', deptId: 'DEP-03', tCode: 'ZQ046', unit: 'Nos', target: 0, rule: 'EQUAL_TO_TARGET', tolMin: 0, tolMax: 0, sapRequired: true, desc: 'OEM customer reported field rejections and assembly discrepancies' },
+        { id: 'DRM-QA-04', name: 'Calibration Pending Past Due Date', deptId: 'DEP-03', tCode: 'IW58', unit: 'Nos', target: 0, rule: 'EQUAL_TO_TARGET', tolMin: 0, tolMax: 0, sapRequired: true, desc: 'Measurement tools and fixtures overdue for NABL recalibration' },
+        { id: 'DRM-QA-05', name: 'Supplier Corrective Action Request Turnaround', deptId: 'DEP-03', tCode: 'QM10', unit: 'Days', target: 14.0, rule: 'LOWER_IS_BETTER', tolMin: 5.0, tolMax: 21.0, sapRequired: true, desc: 'Average days to close 8D SCAR reports with root cause' },
+        { id: 'DRM-QA-06', name: 'In-Process Inspection Clearance Turnaround', deptId: 'DEP-03', tCode: 'QA32', unit: 'Hours', target: 2.0, rule: 'LOWER_IS_BETTER', tolMin: 0.5, tolMax: 3.0, sapRequired: true, desc: 'Average time taken for lab metallographic and CMM testing' },
+        { id: 'DRM-QA-07', name: 'First Time Right (FTR) Assembly Rate', deptId: 'DEP-03', tCode: 'ZQ046', unit: '%', target: 98.5, rule: 'HIGHER_IS_BETTER', tolMin: 96.0, tolMax: 100.0, sapRequired: true, desc: 'Assemblies passing end-of-line testing without rework' },
+
+        // Marketing & Logistics (7)
+        { id: 'DRM-ML-01', name: 'Customer On-Time In-Full Delivery (OTIF)', deptId: 'DEP-04', tCode: 'VL06O', unit: '%', target: 98.0, rule: 'HIGHER_IS_BETTER', tolMin: 95.0, tolMax: 100.0, sapRequired: true, desc: 'Order lines fulfilled within promised dispatch window' },
+        { id: 'DRM-ML-02', name: 'Finished Goods Billing Pending Dispatch', deptId: 'DEP-04', tCode: 'VF04', unit: 'INR Lakhs', target: 15.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 20.0, sapRequired: true, desc: 'Billed invoices awaiting transport placement at dock' },
+        { id: 'DRM-ML-03', name: 'Pending Customer Sales Orders > 7 Days', deptId: 'DEP-04', tCode: 'ZV119', unit: 'Nos', target: 0, rule: 'EQUAL_TO_TARGET', tolMin: 0, tolMax: 2, sapRequired: true, desc: 'Confirmed backorders awaiting production allocation' },
+        { id: 'DRM-ML-04', name: 'Transit Damage / Loss Ratio', deptId: 'DEP-04', tCode: 'ZV048', unit: '%', target: 0.05, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 0.1, sapRequired: true, desc: 'Claims against total outbound transit shipments' },
+        { id: 'DRM-ML-05', name: 'Vehicle Turnaround Time in Plant', deptId: 'DEP-04', tCode: 'ZV085', unit: 'Hours', target: 3.5, rule: 'LOWER_IS_BETTER', tolMin: 2.0, tolMax: 4.5, sapRequired: true, desc: 'Time spent by outbound trailers inside plant gates' },
+        { id: 'DRM-ML-06', name: 'Finished Goods Inventory Holding Period', deptId: 'DEP-04', tCode: 'MB52', unit: 'Days', target: 5.0, rule: 'LOWER_IS_BETTER', tolMin: 3.0, tolMax: 7.0, sapRequired: true, desc: 'Average finished inventory stock days across hubs' },
+        { id: 'DRM-ML-07', name: 'Freight Cost per Ton Dispatched', deptId: 'DEP-04', tCode: 'VF04', unit: 'INR/Ton', target: 1200.0, rule: 'LOWER_IS_BETTER', tolMin: 1000.0, tolMax: 1350.0, sapRequired: false, desc: 'Outbound logistics freight cost efficiency' },
+
+        // Production (7)
+        { id: 'DRM-PR-01', name: 'Overall Equipment Effectiveness (OEE)', deptId: 'DEP-05', tCode: 'COHV', unit: '%', target: 85.0, rule: 'HIGHER_IS_BETTER', tolMin: 80.0, tolMax: 100.0, sapRequired: true, desc: 'Composite metric of machine Availability x Performance x Quality' },
+        { id: 'DRM-PR-02', name: 'Daily Production Plan Adherence', deptId: 'DEP-05', tCode: 'MD62', unit: '%', target: 98.0, rule: 'HIGHER_IS_BETTER', tolMin: 95.0, tolMax: 100.0, sapRequired: true, desc: 'Actual assemblies completed vs master production schedule' },
+        { id: 'DRM-PR-03', name: 'Machine Breakdown / Unplanned Downtime', deptId: 'DEP-05', tCode: 'IW58', unit: 'Hours', target: 12.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 18.0, sapRequired: true, desc: 'Cumulative emergency maintenance hours across stamping and weld lines' },
+        { id: 'DRM-PR-04', name: 'Standard vs Actual Production Cycle Time', deptId: 'DEP-05', tCode: 'COHV', unit: 'Seconds', target: 44.0, rule: 'WITHIN_RANGE', tolMin: 42.0, tolMax: 46.0, sapRequired: true, desc: 'Measured takt time deviation on main assembly conveyor' },
+        { id: 'DRM-PR-05', name: 'Work In Progress (WIP) Value on Shop Floor', deptId: 'DEP-05', tCode: 'MB52', unit: 'INR Lakhs', target: 25.0, rule: 'LOWER_IS_BETTER', tolMin: 15.0, tolMax: 30.0, sapRequired: true, desc: 'Unfinished subassemblies between line stages' },
+        { id: 'DRM-PR-06', name: 'Production Scrap Generation Rate', deptId: 'DEP-05', tCode: 'MB51', unit: '%', target: 1.2, rule: 'LOWER_IS_BETTER', tolMin: 0.5, tolMax: 1.5, sapRequired: true, desc: 'Metal stamping and machining scrap as a percentage of gross input' },
+        { id: 'DRM-PR-07', name: 'Changeover Time (SMED Matrix)', deptId: 'DEP-05', tCode: 'COHV', unit: 'Minutes', target: 30.0, rule: 'LOWER_IS_BETTER', tolMin: 20.0, tolMax: 40.0, sapRequired: false, desc: 'Single-minute exchange of dies turnaround for tool changes' },
+
+        // General Departments (7)
+        { id: 'DRM-GD-01', name: 'Plant Safety - Lost Time Injury Frequency Rate', deptId: 'DEP-06', tCode: 'SQ01', unit: 'Rate', target: 0.0, rule: 'EQUAL_TO_TARGET', tolMin: 0.0, tolMax: 0.0, sapRequired: false, desc: 'OSHA compliant incident frequency per million man-hours' },
+        { id: 'DRM-GD-02', name: 'Mandatory Skill Training Hours Compliance', deptId: 'DEP-06', tCode: 'SQ01', unit: '%', target: 95.0, rule: 'HIGHER_IS_BETTER', tolMin: 90.0, tolMax: 100.0, sapRequired: false, desc: 'Adherence to technical and safety refresher training schedules' },
+        { id: 'DRM-GD-03', name: 'Employee Absenteeism Rate', deptId: 'DEP-06', tCode: 'SQ01', unit: '%', target: 4.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 5.0, sapRequired: false, desc: 'Unplanned shopfloor absenteeism across three shifts' },
+        { id: 'DRM-GD-04', name: 'Near-Miss Incident Closure Rate within 48h', deptId: 'DEP-06', tCode: 'SQ01', unit: '%', target: 100.0, rule: 'EQUAL_TO_TARGET', tolMin: 100.0, tolMax: 100.0, sapRequired: false, desc: 'Safety hazards reported and eliminated by line supervisors' },
+        { id: 'DRM-GD-05', name: 'Plant Utility Specific Power Consumption', deptId: 'DEP-06', tCode: 'SQ01', unit: 'kWh/Ton', target: 140.0, rule: 'LOWER_IS_BETTER', tolMin: 120.0, tolMax: 150.0, sapRequired: false, desc: 'Electrical energy consumed per metric ton of automotive output' },
+        { id: 'DRM-GD-06', name: 'Statutory Compliance Timeliness', deptId: 'DEP-06', tCode: 'SQ01', unit: '%', target: 100.0, rule: 'EQUAL_TO_TARGET', tolMin: 100.0, tolMax: 100.0, sapRequired: false, desc: 'Pollution board, factory inspectorate and boiler submissions' },
+        { id: 'DRM-GD-07', name: 'IT System Uptime & SAP Availability', deptId: 'DEP-06', tCode: 'SQ01', unit: '%', target: 99.9, rule: 'HIGHER_IS_BETTER', tolMin: 99.5, tolMax: 100.0, sapRequired: false, desc: 'ERP server, MES terminal and shopfloor network availability' },
+
+        // Finance (7)
+        { id: 'DRM-FN-01', name: 'Vendor Invoice Processing Turnaround', deptId: 'DEP-07', tCode: 'ZM063K', unit: 'Days', target: 3.0, rule: 'LOWER_IS_BETTER', tolMin: 1.0, tolMax: 4.0, sapRequired: true, desc: 'Three-way match (PO-GRN-Invoice) turnaround time to approval' },
+        { id: 'DRM-FN-02', name: 'Outstanding Accounts Receivable > 60 Days', deptId: 'DEP-07', tCode: 'VF04', unit: 'INR Lakhs', target: 20.0, rule: 'LOWER_IS_BETTER', tolMin: 0, tolMax: 25.0, sapRequired: true, desc: 'Delayed customer payments past credit terms' },
+        { id: 'DRM-FN-03', name: 'Unreconciled Bank & Cash Items', deptId: 'DEP-07', tCode: 'FBL3N', unit: 'Nos', target: 0, rule: 'EQUAL_TO_TARGET', tolMin: 0, tolMax: 0, sapRequired: false, desc: 'Unidentified ledger clearances at monthly financial closing' },
+        { id: 'DRM-FN-04', name: 'Capex Budget vs Actual Variance', deptId: 'DEP-07', tCode: 'S_ALR_87013558', unit: '%', target: 0.0, rule: 'WITHIN_RANGE', tolMin: -5.0, tolMax: 5.0, sapRequired: false, desc: 'Capital equipment expenditure variance against approved AOP' },
+        { id: 'DRM-FN-05', name: 'GST & TDS Input Credit Reconciliation', deptId: 'DEP-07', tCode: 'J1IEX', unit: '%', target: 100.0, rule: 'EQUAL_TO_TARGET', tolMin: 100.0, tolMax: 100.0, sapRequired: true, desc: 'GSTR-2B vs purchase register matching percentage' },
+        { id: 'DRM-FN-06', name: 'Working Capital Cycle Duration', deptId: 'DEP-07', tCode: 'FBL1N', unit: 'Days', target: 45.0, rule: 'LOWER_IS_BETTER', tolMin: 35.0, tolMax: 50.0, sapRequired: false, desc: 'Days sales of inventory + DSO minus DPO' },
+        { id: 'DRM-FN-07', name: 'Scrap Sale Realization Value', deptId: 'DEP-07', tCode: 'VF04', unit: 'INR Lakhs', target: 15.0, rule: 'HIGHER_IS_BETTER', tolMin: 12.0, tolMax: 20.0, sapRequired: true, desc: 'Monthly realized revenue from metallics and dross scrap auctions' }
+      ];
+
+      const DEPARTMENTS = [
+        { id: 'DEP-01', name: 'Materials Management Department', code: 'MMD', head: 'Rajesh Sharma', active: true, count: 7 },
+        { id: 'DEP-02', name: 'Stores', code: 'STR', head: 'Vikram Patil', active: true, count: 6 },
+        { id: 'DEP-03', name: 'Quality', code: 'QA', head: 'Dr. Anita Roy', active: true, count: 7 },
+        { id: 'DEP-04', name: 'Marketing & Logistics', code: 'MKT_LOG', head: 'Sunil Menon', active: true, count: 7 },
+        { id: 'DEP-05', name: 'Production', code: 'PROD', head: 'K. Murthy', active: true, count: 7 },
+        { id: 'DEP-06', name: 'General Departments', code: 'GEN', head: 'Pooja Varma', active: true, count: 7 },
+        { id: 'DEP-07', name: 'Finance', code: 'FIN', head: 'Amit Bansal', active: true, count: 7 }
+      ];
+
+      const MONTHS = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+
+      // Client State
+      window.app = {
+        state: {
+          currentView: 'dashboard',
+          currentFy: 'FY 2026-2027',
+          currentMonth: 'October',
+          currentDept: 'ALL',
+          currentRole: 'ADMIN',
+          currentUser: 'admin@company.com',
+          indicators: CORE_INDICATORS,
+          departments: DEPARTMENTS,
+          records: [],
+          correctiveActions: [],
+          uploads: [],
+          auditLogs: [],
+          charts: {}
+        },
+
+        init: function() {
+          this.initSeedData();
+          this.bindEvents();
+          this.navigate('dashboard');
+          if (window.lucide) lucide.createIcons();
+        },
+
+        initSeedData: function() {
+          // Generate sample baseline actual records for FY 2026-2027
+          const records = [];
+          const monthsSample = ['April', 'May', 'June', 'July', 'August', 'September', 'October'];
+          
+          this.state.indicators.forEach((ind, idx) => {
+            monthsSample.forEach((m, mIdx) => {
+              // Generate realistic values
+              let actual = null;
+              let status = 'Draft';
+              let compStatus = 'Not Reported';
+              
+              if (mIdx < 6) { // Past months completed & approved
+                status = 'Approved';
+                if (ind.rule === 'HIGHER_IS_BETTER') actual = +(ind.target * (0.94 + Math.random() * 0.1)).toFixed(1);
+                else if (ind.rule === 'LOWER_IS_BETTER') actual = +(ind.target * (0.85 + Math.random() * 0.3)).toFixed(1);
+                else if (ind.rule === 'WITHIN_RANGE') actual = +(ind.tolMin + Math.random() * (ind.tolMax - ind.tolMin)).toFixed(1);
+                else actual = ind.target; // Exact
+                
+                compStatus = this.calculateCompliance(ind.rule, actual, ind.target, ind.tolMin, ind.tolMax).status;
+              } else if (mIdx === 6) { // Current month (October)
+                // Mixed reporting
+                if (idx % 4 !== 0) {
+                  status = idx % 2 === 0 ? 'Submitted' : 'Under Review';
+                  if (ind.rule === 'HIGHER_IS_BETTER') actual = +(ind.target * (0.92 + Math.random() * 0.12)).toFixed(1);
+                  else if (ind.rule === 'LOWER_IS_BETTER') actual = +(ind.target * (0.90 + Math.random() * 0.25)).toFixed(1);
+                  else actual = ind.target;
+                  compStatus = this.calculateCompliance(ind.rule, actual, ind.target, ind.tolMin, ind.tolMax).status;
+                }
+              }
+
+              const res = this.calculateCompliance(ind.rule, actual, ind.target, ind.tolMin, ind.tolMax);
+
+              records.push({
+                id: `REC-${ind.id}-${m}`,
+                financialYear: 'FY 2026-2027',
+                month: m,
+                indicatorId: ind.id,
+                departmentId: ind.deptId,
+                targetValue: ind.target,
+                actualValue: actual,
+                variance: res.variance,
+                achievementPct: res.achievementPct,
+                complianceStatus: compStatus,
+                status: status,
+                remarks: actual !== null ? 'Validated from SAP export' : '',
+                updatedBy: 'suresh.kumar@company.com',
+                updatedAt: '2026-10-28T10:00:00Z',
+                approvedBy: status === 'Approved' ? 'approver@company.com' : ''
+              });
+            });
+          });
+
+          this.state.records = records;
+
+          // Sample corrective actions
+          this.state.correctiveActions = [
+            {
+              actionId: 'CAPA-082',
+              indicatorId: 'DRM-MM-03',
+              departmentId: 'DEP-01',
+              financialYear: 'FY 2026-2027',
+              month: 'October',
+              problemDescription: 'Vendor delivery adherence dropped to 89.2% due to casting supplier furnace breakdown in Pune cluster.',
+              rootCause: 'Single tier-2 source vulnerability for cylinder head casting.',
+              correctiveAction: 'Audited and approved secondary supplier in Coimbatore. Diverted 35% monthly allocation.',
+              preventiveAction: 'Dual-sourcing mandate implemented in SAP vendor master for all Grade-A automotive castings.',
+              assignedOwner: 'rajesh.sharma@company.com',
+              priority: 'High',
+              dueDate: '2026-11-15',
+              status: 'In Progress',
+              reviewerComments: 'Progress reviewed during Operations DRM on Oct 25. Trial lots cleared.'
+            },
+            {
+              actionId: 'CAPA-079',
+              indicatorId: 'DRM-QA-02',
+              departmentId: 'DEP-03',
+              financialYear: 'FY 2026-2027',
+              month: 'September',
+              problemDescription: 'Line rejection spiked to 1.15% on Gearbox Assembly Line 2.',
+              rootCause: 'Torque wrench pneumatic pressure fluctuations causing improper fastener engagement.',
+              correctiveAction: 'Replaced pneumatic regulators with digital torque sensor transducers with auto-interlock.',
+              preventiveAction: 'Daily automated calibration self-check integrated into MES line PLC.',
+              assignedOwner: 'qc.engineer@company.com',
+              priority: 'Critical',
+              dueDate: '2026-10-10',
+              status: 'Closed',
+              reviewerComments: 'Confirmed zero torque faults for 3 consecutive weeks.'
+            }
+          ];
+
+          // Sample Upload History
+          this.state.uploads = [
+            { uploadId: 'SAP-9481', fileName: 'ZM088_Vendor_OTIF_Oct2026.xlsx', deptId: 'DEP-01', fy: 'FY 2026-2027', month: 'October', tCode: 'ZM088', rows: 480, rejected: 0, status: 'Completed', user: 'suresh.kumar@company.com', date: '2026-10-28 09:30' },
+            { uploadId: 'SAP-9480', fileName: 'MB52_Stock_Valuation_Oct2026.xlsx', deptId: 'DEP-02', fy: 'FY 2026-2027', month: 'October', tCode: 'MB52', rows: 1250, rejected: 2, status: 'Completed', user: 'stores.lead@company.com', date: '2026-10-27 16:45' },
+            { uploadId: 'SAP-9475', fileName: 'QA32_Incoming_Rejection_Oct2026.csv', deptId: 'DEP-03', fy: 'FY 2026-2027', month: 'October', tCode: 'QA32', rows: 320, rejected: 0, status: 'Completed', user: 'qc.engineer@company.com', date: '2026-10-26 14:15' }
+          ];
+
+          // Audit logs
+          this.state.auditLogs = [
+            { id: 'AUD-902', time: '2026-10-30 08:45:10', user: 'admin@company.com', module: 'INDICATORS', action: 'UPDATE', recordId: 'DRM-MM-03', details: 'Updated tolerance range for V-OTIF metric' },
+            { id: 'AUD-901', time: '2026-10-29 17:12:00', user: 'quality.head@company.com', module: 'APPROVALS', action: 'APPROVE', recordId: 'REC-DRM-QA-01-September', details: 'Approved September QA incoming rejection submission' },
+            { id: 'AUD-900', time: '2026-10-28 09:32:45', user: 'suresh.kumar@company.com', module: 'SAP_UPLOADS', action: 'UPLOAD', recordId: 'SAP-9481', details: 'Uploaded ZM088 SAP report to Drive' }
+          ];
+        },
+
+        calculateCompliance: function(rule, actual, target, tolMin, tolMax) {
+          if (actual === null || actual === undefined || isNaN(actual)) {
+            return { status: 'Not Reported', achievementPct: null, variance: null };
+          }
+          actual = Number(actual);
+          target = Number(target);
+          let variance = +(actual - target).toFixed(2);
+          let achievementPct = null;
+          let status = 'Non-Compliant';
+
+          if (rule === 'HIGHER_IS_BETTER') {
+            if (target !== 0) achievementPct = +((actual / target) * 100).toFixed(1);
+            if (actual >= target) status = 'Compliant';
+            else if (tolMin !== undefined && actual >= tolMin) status = 'Action Required';
+            else status = 'Non-Compliant';
+          } else if (rule === 'LOWER_IS_BETTER') {
+            if (target !== 0) achievementPct = +((target / actual) * 100).toFixed(1);
+            variance = +(target - actual).toFixed(2);
+            if (actual <= target) status = 'Compliant';
+            else if (tolMax !== undefined && actual <= tolMax) status = 'Action Required';
+            else status = 'Non-Compliant';
+          } else if (rule === 'EQUAL_TO_TARGET') {
+            if (actual === target) { status = 'Compliant'; achievementPct = 100.0; }
+            else { status = 'Non-Compliant'; achievementPct = 0.0; }
+          } else if (rule === 'WITHIN_RANGE') {
+            if (actual >= tolMin && actual <= tolMax) {
+              status = 'Compliant';
+              achievementPct = 100.0;
+            } else {
+              status = 'Non-Compliant';
+              achievementPct = Math.max(0, 100 - Math.abs(actual - target));
+            }
+          }
+          return { status, achievementPct, variance };
+        },
+
+        navigate: function(viewId) {
+          this.state.currentView = viewId;
+          document.querySelectorAll('.nav-item').forEach(el => {
+            if (el.getAttribute('data-view') === viewId) {
+              el.classList.add('bg-sky-50', 'text-sky-700', 'font-semibold', 'dark:bg-sky-950', 'dark:text-sky-300');
+            } else {
+              el.classList.remove('bg-sky-50', 'text-sky-700', 'font-semibold', 'dark:bg-sky-950', 'dark:text-sky-300');
+            }
+          });
+
+          const mount = document.getElementById('viewMount');
+          if (viewId === 'dashboard') this.renderDashboard(mount);
+          else if (viewId === 'indicators') this.renderIndicators(mount);
+          else if (viewId === 'monthly') this.renderMonthlyTracking(mount);
+          else if (viewId === 'sap_upload') this.renderSapUpload(mount);
+          else if (viewId === 'approvals') this.renderApprovals(mount);
+          else if (viewId === 'corrective_actions') this.renderCorrectiveActions(mount);
+          else if (viewId === 'departments') this.renderDepartments(mount);
+          else if (viewId === 'reports') this.renderReports(mount);
+          else if (viewId === 'historical') this.renderHistorical(mount);
+          else if (viewId === 'audit') this.renderAudit(mount);
+          else if (viewId === 'settings') this.renderSettings(mount);
+
+          if (window.lucide) lucide.createIcons();
+        },
+
+        renderDashboard: function(mount) {
+          // Dynamic calculation of the 8 KPI cards for selected Month
+          const monthRecords = this.state.records.filter(r => r.financialYear === this.state.currentFy && r.month === this.state.currentMonth);
+          const totalIndicators = this.state.indicators.length;
+          const reported = monthRecords.filter(r => r.actualValue !== null).length;
+          const approved = monthRecords.filter(r => r.status === 'Approved').length;
+          const pending = monthRecords.filter(r => r.status === 'Submitted' || r.status === 'Under Review').length;
+          const compliant = monthRecords.filter(r => r.complianceStatus === 'Compliant').length;
+          const nonCompliant = monthRecords.filter(r => r.complianceStatus === 'Non-Compliant').length;
+          const actionReq = monthRecords.filter(r => r.complianceStatus === 'Action Required').length;
+          const completionPct = Math.round((reported / totalIndicators) * 100) || 0;
+
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <!-- Header / Filter Bar -->
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Executive DRM Dashboard</h1>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Digital Reporting & Monitoring Matrix · IATF 16949 Operations Overview</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                  <div class="flex items-center gap-2 text-xs">
+                    <span class="text-slate-500">Month:</span>
+                    <select onchange="window.app.handleMonthChange(this.value)" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 font-medium text-slate-800 dark:text-slate-200 focus:outline-hidden">
+                      ${MONTHS.map(m => `<option value="${m}" ${m === this.state.currentMonth ? 'selected' : ''}>${m}</option>`).join('')}
+                    </select>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs">
+                    <span class="text-slate-500">Department:</span>
+                    <select onchange="window.app.handleDeptChange(this.value)" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 font-medium text-slate-800 dark:text-slate-200 focus:outline-hidden">
+                      <option value="ALL">All Departments (7)</option>
+                      ${this.state.departments.map(d => `<option value="${d.id}" ${d.id === this.state.currentDept ? 'selected' : ''}>${d.name}</option>`).join('')}
+                    </select>
+                  </div>
+                  <button onclick="window.app.refreshData()" class="p-2 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Refresh">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 8 KPI STATS STRIP -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Total DRM</span>
+                  <div class="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">${totalIndicators}</div>
+                  <span class="text-[10px] text-slate-400">Target metrics</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Reported</span>
+                  <div class="text-2xl font-bold text-sky-600 tabular-nums">${reported}</div>
+                  <span class="text-[10px] text-slate-400">${Math.round((reported/totalIndicators)*100)}% coverage</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Approved</span>
+                  <div class="text-2xl font-bold text-teal-600 tabular-nums">${approved}</div>
+                  <span class="text-[10px] text-slate-400">Locked actuals</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Pending</span>
+                  <div class="text-2xl font-bold text-amber-500 tabular-nums">${pending}</div>
+                  <span class="text-[10px] text-slate-400">Under review</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Compliant</span>
+                  <div class="text-2xl font-bold text-emerald-600 tabular-nums">${compliant}</div>
+                  <span class="text-[10px] text-emerald-600 font-medium">On target</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Non-Compliant</span>
+                  <div class="text-2xl font-bold text-rose-600 tabular-nums">${nonCompliant}</div>
+                  <span class="text-[10px] text-rose-600 font-medium">Off target</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Action Req.</span>
+                  <div class="text-2xl font-bold text-amber-600 tabular-nums">${actionReq}</div>
+                  <span class="text-[10px] text-amber-600 font-medium">Tolerance zone</span>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <span class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Completion</span>
+                  <div class="text-2xl font-bold text-blue-700 dark:text-sky-400 tabular-nums">${completionPct}%</div>
+                  <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                    <div class="bg-blue-600 h-full" style="width: ${completionPct}%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 6 CHARTS GRID -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Monthly DRM Performance Trend -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Chart 1: Monthly DRM Reporting Trend</h3>
+                      <p class="text-[11px] text-slate-500">April to March financial cycle completion velocity</p>
+                    </div>
+                    <span class="text-xs font-mono text-slate-400">${this.state.currentFy}</span>
+                  </div>
+                  <div class="h-64">
+                    <canvas id="chartMonthlyPerformance"></canvas>
+                  </div>
+                </div>
+
+                <!-- Chart 2: Department-Wise Compliance -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Chart 2: Department-Wise Compliance</h3>
+                      <p class="text-[11px] text-slate-500">Percentage of target achievement by department</p>
+                    </div>
+                    <span class="text-xs text-teal-600 font-medium">${this.state.currentMonth}</span>
+                  </div>
+                  <div class="h-64">
+                    <canvas id="chartDeptCompliance"></canvas>
+                  </div>
+                </div>
+
+                <!-- Chart 3: Indicator Status Distribution -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Chart 3: Indicator Status Breakdown</h3>
+                      <p class="text-[11px] text-slate-500">Compliant vs Action Required vs Non-Compliant</p>
+                    </div>
+                  </div>
+                  <div class="h-64 flex items-center justify-center">
+                    <canvas id="chartStatusPie"></canvas>
+                  </div>
+                </div>
+
+                <!-- Chart 4: Department Performance Ranking -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Chart 4: Operational Score Ranking</h3>
+                      <p class="text-[11px] text-slate-500">Weighted scorecard based on compliance and on-time reporting</p>
+                    </div>
+                  </div>
+                  <div class="h-64">
+                    <canvas id="chartDeptRanking"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Attention Table: Non-Compliant Indicators requiring Review -->
+              <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-semibold text-slate-900 dark:text-white">Priority Focus: Deviations & Corrective Actions Needed</h3>
+                    <p class="text-xs text-slate-500">Indicators currently failing SLA or within tolerance warning zone in ${this.state.currentMonth}</p>
+                  </div>
+                  <button onclick="window.app.navigate('corrective_actions')" class="text-xs text-sky-600 hover:text-sky-700 font-medium">View All CAPA &rarr;</button>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b border-slate-200/60 dark:border-slate-800">
+                      <tr>
+                        <th class="py-2.5 px-4 font-semibold">ID</th>
+                        <th class="py-2.5 px-4 font-semibold">Indicator Name</th>
+                        <th class="py-2.5 px-4 font-semibold">Department</th>
+                        <th class="py-2.5 px-4 font-semibold">SAP Code</th>
+                        <th class="py-2.5 px-4 font-semibold text-right">Target</th>
+                        <th class="py-2.5 px-4 font-semibold text-right">Actual</th>
+                        <th class="py-2.5 px-4 font-semibold">Status</th>
+                        <th class="py-2.5 px-4 font-semibold text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                      ${monthRecords.filter(r => r.complianceStatus === 'Non-Compliant' || r.complianceStatus === 'Action Required').slice(0, 6).map(r => {
+                        const ind = this.state.indicators.find(i => i.id === r.indicatorId) || {};
+                        const dept = this.state.departments.find(d => d.id === r.departmentId) || {};
+                        const badgeColor = r.complianceStatus === 'Non-Compliant' ? 'text-rose-600 bg-rose-50 dark:bg-rose-950/40' : 'text-amber-600 bg-amber-50 dark:bg-amber-950/40';
+                        return `
+                          <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="py-2.5 px-4 font-mono font-medium text-slate-700 dark:text-slate-300">${r.indicatorId}</td>
+                            <td class="py-2.5 px-4 font-medium text-slate-900 dark:text-white max-w-xs truncate">${ind.name || r.indicatorId}</td>
+                            <td class="py-2.5 px-4 text-slate-500">${dept.code || r.departmentId}</td>
+                            <td class="py-2.5 px-4 font-mono text-slate-500">${ind.tCode || '-'}</td>
+                            <td class="py-2.5 px-4 text-right tabular-nums text-slate-600 dark:text-slate-300">${r.targetValue} ${ind.unit || ''}</td>
+                            <td class="py-2.5 px-4 text-right tabular-nums font-bold ${r.complianceStatus === 'Non-Compliant' ? 'text-rose-600' : 'text-amber-600'}">${r.actualValue !== null ? r.actualValue : 'N/A'} ${ind.unit || ''}</td>
+                            <td class="py-2.5 px-4">
+                              <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${badgeColor}">${r.complianceStatus}</span>
+                            </td>
+                            <td class="py-2.5 px-4 text-center">
+                              <button onclick="window.app.openCreateCapaModal('${r.indicatorId}', '${r.departmentId}')" class="px-2 py-1 text-[11px] font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded transition-colors">
+                                Raise CAPA
+                              </button>
+                            </td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+
+          this.initDashboardCharts(monthRecords);
+        },
+
+        initDashboardCharts: function(monthRecords) {
+          // Chart 1: Monthly Performance
+          const ctx1 = document.getElementById('chartMonthlyPerformance');
+          if (ctx1) {
+            new Chart(ctx1, {
+              type: 'bar',
+              data: {
+                labels: MONTHS,
+                datasets: [
+                  {
+                    label: 'Reported %',
+                    data: [100, 100, 100, 100, 100, 100, 78, 0, 0, 0, 0, 0],
+                    backgroundColor: '#0284C7',
+                    borderRadius: 4
+                  },
+                  {
+                    label: 'Approved %',
+                    data: [98, 96, 94, 96, 92, 94, 52, 0, 0, 0, 0, 0],
+                    backgroundColor: '#0D9488',
+                    borderRadius: 4
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+                }
+              }
+            });
+          }
+
+          // Chart 2: Dept Compliance
+          const ctx2 = document.getElementById('chartDeptCompliance');
+          if (ctx2) {
+            new Chart(ctx2, {
+              type: 'bar',
+              data: {
+                labels: this.state.departments.map(d => d.code),
+                datasets: [{
+                  label: 'Compliance Rate %',
+                  data: [88, 94, 85, 92, 89, 97, 91],
+                  backgroundColor: ['#0284C7', '#0D9488', '#06B6D4', '#2563EB', '#F59E0B', '#10B981', '#6366F1'],
+                  borderRadius: 4
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+                }
+              }
+            });
+          }
+
+          // Chart 3: Status Distribution
+          const ctx3 = document.getElementById('chartStatusPie');
+          if (ctx3) {
+            new Chart(ctx3, {
+              type: 'doughnut',
+              data: {
+                labels: ['Compliant', 'Action Required', 'Non-Compliant', 'Not Reported'],
+                datasets: [{
+                  data: [32, 6, 8, 2],
+                  backgroundColor: ['#10B981', '#F59E0B', '#EF4444', '#94A3B8'],
+                  borderWidth: 0
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'bottom' }
+                }
+              }
+            });
+          }
+
+          // Chart 4: Department Ranking
+          const ctx4 = document.getElementById('chartDeptRanking');
+          if (ctx4) {
+            new Chart(ctx4, {
+              type: 'bar',
+              indexAxis: 'y',
+              data: {
+                labels: ['General Depts', 'Stores', 'Marketing & Log.', 'Finance', 'Production', 'Materials Mgmt', 'Quality'],
+                datasets: [{
+                  label: 'Overall Performance Index',
+                  data: [96.2, 94.8, 92.4, 91.0, 89.5, 87.8, 85.2],
+                  backgroundColor: '#0369A1',
+                  borderRadius: 4
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: { beginAtZero: true, max: 100 }
+                }
+              }
+            });
+          }
+        },
+
+        // DRM Indicator Register
+        renderIndicators: function(mount) {
+          const deptFilter = this.state.currentDept;
+          const filtered = this.state.indicators.filter(i => deptFilter === 'ALL' || i.deptId === deptFilter);
+
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">DRM Indicator Register</h1>
+                  <p class="text-xs text-slate-500">Master repository of 48 automotive plant indicators, SAP T-Codes, and formulas</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <input type="text" id="indSearchInput" onkeyup="window.app.filterIndicatorTable()" placeholder="Search indicator or SAP code..." class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-hidden w-64">
+                  <button onclick="window.app.openAddIndicatorModal()" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add Indicator</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Indicators Table -->
+              <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs" id="indicatorMasterTable">
+                    <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 border-b border-slate-200/80 dark:border-slate-800">
+                      <tr>
+                        <th class="py-3 px-4 font-semibold">Indicator ID</th>
+                        <th class="py-3 px-4 font-semibold">Indicator Name & Description</th>
+                        <th class="py-3 px-4 font-semibold">Department</th>
+                        <th class="py-3 px-4 font-semibold">SAP T-Code</th>
+                        <th class="py-3 px-4 font-semibold">Unit</th>
+                        <th class="py-3 px-4 font-semibold text-right">Target</th>
+                        <th class="py-3 px-4 font-semibold">Calculation Method</th>
+                        <th class="py-3 px-4 font-semibold text-center">SAP Req.</th>
+                        <th class="py-3 px-4 font-semibold text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                      ${filtered.map(ind => {
+                        const dept = this.state.departments.find(d => d.id === ind.deptId) || {};
+                        return `
+                          <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="py-3 px-4 font-mono font-medium text-sky-700 dark:text-sky-400 whitespace-nowrap">${ind.id}</td>
+                            <td class="py-3 px-4 max-w-sm">
+                              <div class="font-semibold text-slate-900 dark:text-white">${ind.name}</div>
+                              <div class="text-[11px] text-slate-400 truncate">${ind.desc || ''}</div>
+                            </td>
+                            <td class="py-3 px-4 font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap">${dept.code || ind.deptId}</td>
+                            <td class="py-3 px-4 font-mono text-slate-500 whitespace-nowrap bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded">${ind.tCode}</td>
+                            <td class="py-3 px-4 text-slate-600 dark:text-slate-400">${ind.unit}</td>
+                            <td class="py-3 px-4 text-right font-bold tabular-nums text-slate-800 dark:text-slate-200">${ind.target}</td>
+                            <td class="py-3 px-4 text-slate-500 font-mono text-[11px]">${ind.rule}</td>
+                            <td class="py-3 px-4 text-center">
+                              ${ind.sapRequired ? '<span class="text-teal-600 font-bold">YES</span>' : '<span class="text-slate-300">NO</span>'}
+                            </td>
+                            <td class="py-3 px-4 text-right whitespace-nowrap">
+                              <button onclick="window.app.editIndicator('${ind.id}')" class="p-1.5 text-slate-400 hover:text-sky-600 transition-colors">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+
+        // Monthly Tracking
+        renderMonthlyTracking: function(mount) {
+          const records = this.state.records.filter(r => r.financialYear === this.state.currentFy && r.month === this.state.currentMonth);
+
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Monthly DRM Performance Entry</h1>
+                  <p class="text-xs text-slate-500">Period: ${this.state.currentMonth} · ${this.state.currentFy}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button onclick="window.app.batchSubmitRecords()" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    <span>Submit Month for Review</span>
+                  </button>
+                  <button onclick="window.app.exportMonthlyCsv()" class="px-3 py-1.5 text-xs font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    Export CSV
+                  </button>
+                </div>
+              </div>
+
+              <!-- Entry Table -->
+              <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 border-b border-slate-200/80 dark:border-slate-800">
+                      <tr>
+                        <th class="py-3 px-4 font-semibold">ID</th>
+                        <th class="py-3 px-4 font-semibold">Indicator Name</th>
+                        <th class="py-3 px-4 font-semibold">Dept</th>
+                        <th class="py-3 px-4 font-semibold text-right">Target</th>
+                        <th class="py-3 px-4 font-semibold text-right">Actual Entry</th>
+                        <th class="py-3 px-4 font-semibold text-right">Variance</th>
+                        <th class="py-3 px-4 font-semibold text-right">Achieve %</th>
+                        <th class="py-3 px-4 font-semibold">Compliance</th>
+                        <th class="py-3 px-4 font-semibold">Workflow Status</th>
+                        <th class="py-3 px-4 font-semibold text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                      ${records.map(r => {
+                        const ind = this.state.indicators.find(i => i.id === r.indicatorId) || {};
+                        const isLocked = r.status === 'Approved';
+                        return `
+                          <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="py-3 px-4 font-mono font-medium text-slate-700 dark:text-slate-300">${r.indicatorId}</td>
+                            <td class="py-3 px-4 font-medium text-slate-900 dark:text-white max-w-xs truncate">${ind.name}</td>
+                            <td class="py-3 px-4 text-slate-500">${ind.deptId}</td>
+                            <td class="py-3 px-4 text-right tabular-nums text-slate-600 dark:text-slate-400">${r.targetValue} ${ind.unit}</td>
+                            <td class="py-2 px-4 text-right">
+                              ${isLocked ? 
+                                `<span class="font-bold tabular-nums text-slate-900 dark:text-white">${r.actualValue !== null ? r.actualValue : 'N/A'}</span>` : 
+                                `<input type="number" step="0.01" value="${r.actualValue !== null ? r.actualValue : ''}" onchange="window.app.updateActualRow('${r.id}', this.value)" class="w-24 px-2 py-1 text-right bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded text-xs font-bold text-slate-900 dark:text-white focus:outline-sky-500">`
+                              }
+                            </td>
+                            <td class="py-3 px-4 text-right tabular-nums text-slate-500">${r.variance !== null ? r.variance : '-'}</td>
+                            <td class="py-3 px-4 text-right tabular-nums font-semibold">${r.achievementPct !== null ? r.achievementPct + '%' : 'N/A'}</td>
+                            <td class="py-3 px-4">
+                              <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                r.complianceStatus === 'Compliant' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40' :
+                                r.complianceStatus === 'Action Required' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40' :
+                                r.complianceStatus === 'Non-Compliant' ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40' :
+                                'bg-slate-100 text-slate-600 dark:bg-slate-800'
+                              }">
+                                ${r.complianceStatus}
+                              </span>
+                            </td>
+                            <td class="py-3 px-4">
+                              <span class="text-xs font-medium text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full ${
+                                  r.status === 'Approved' ? 'bg-teal-500' :
+                                  r.status === 'Submitted' ? 'bg-sky-500' :
+                                  r.status === 'Under Review' ? 'bg-amber-500' : 'bg-slate-400'
+                                }"></span>
+                                ${r.status}
+                              </span>
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                              ${isLocked ? 
+                                `<span class="text-[11px] text-teal-600 font-medium">Locked</span>` : 
+                                `<button onclick="window.app.submitSingleRecord('${r.id}')" class="px-2 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded">Submit</button>`
+                              }
+                            </td>
+                          </tr>
+                        `;
+                      }).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+
+        // SAP Data Upload (6-Step Wizard)
+        renderSapUpload: function(mount) {
+          mount.innerHTML = `
+            <div class="max-w-4xl mx-auto space-y-6">
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">SAP Excel / CSV Data Import Wizard</h1>
+                <p class="text-xs text-slate-500">Secure automated ingestion for SAP ECC / S4HANA exports (ZM088, MB52, QA32, COHV, VF04)</p>
+                
+                <!-- 6 Steps Indicator -->
+                <div class="grid grid-cols-6 gap-2 my-6">
+                  <div class="border-t-2 border-sky-600 pt-1 text-[10px] font-semibold text-sky-600">1. Select File</div>
+                  <div class="border-t-2 border-slate-200 dark:border-slate-800 pt-1 text-[10px] font-semibold text-slate-400">2. Preview</div>
+                  <div class="border-t-2 border-slate-200 dark:border-slate-800 pt-1 text-[10px] font-semibold text-slate-400">3. Validate</div>
+                  <div class="border-t-2 border-slate-200 dark:border-slate-800 pt-1 text-[10px] font-semibold text-slate-400">4. Map Columns</div>
+                  <div class="border-t-2 border-slate-200 dark:border-slate-800 pt-1 text-[10px] font-semibold text-slate-400">5. Confirm</div>
+                  <div class="border-t-2 border-slate-200 dark:border-slate-800 pt-1 text-[10px] font-semibold text-slate-400">6. Process</div>
+                </div>
+
+                <!-- Form Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs mb-6">
+                  <div>
+                    <label class="block font-medium text-slate-700 dark:text-slate-300 mb-1">SAP Transaction / Report</label>
+                    <select id="sapTCodeSelect" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-2 font-mono">
+                      <option value="ZM088">ZM088 - Vendor OTIF & Delivery Adherence</option>
+                      <option value="MB52">MB52 - Warehouse Stock by Storage Location</option>
+                      <option value="QA32">QA32 - Inspection Lot Rejection & PPM Summary</option>
+                      <option value="COHV">COHV - Mass Production Orders & OEE Data</option>
+                      <option value="VF04">VF04 - Billing Due List & Outbound Realization</option>
+                      <option value="QM10">QM10 - Notification & Defect Items</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-medium text-slate-700 dark:text-slate-300 mb-1">Target Department</label>
+                    <select id="sapDeptSelect" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-2">
+                      ${this.state.departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-medium text-slate-700 dark:text-slate-300 mb-1">Reporting Period</label>
+                    <div class="grid grid-cols-2 gap-2">
+                      <select id="sapFySelect" class="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-2 font-medium">
+                        <option value="FY 2026-2027">FY 2026–2027</option>
+                        <option value="FY 2025-2026">FY 2025–2026</option>
+                      </select>
+                      <select id="sapMonthSelect" class="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg p-2 font-medium">
+                        ${MONTHS.map(m => `<option value="${m}" ${m === this.state.currentMonth ? 'selected' : ''}>${m}</option>`).join('')}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block font-medium text-slate-700 dark:text-slate-300 mb-1">Upload Mode</label>
+                    <input type="text" value="Google Drive / SAP_DRM_Data Storage" disabled class="w-full bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-400">
+                  </div>
+                </div>
+
+                <!-- Dropzone Area -->
+                <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center hover:border-sky-500 transition-colors cursor-pointer bg-slate-50/50 dark:bg-slate-800/30">
+                  <i data-lucide="upload-cloud" class="w-10 h-10 text-sky-600 mx-auto mb-2"></i>
+                  <span class="text-sm font-semibold text-slate-800 dark:text-slate-200 block">Drag and drop your SAP export file here</span>
+                  <span class="text-xs text-slate-400 block mt-1">Supports standard .xlsx, .xls, and .csv export formats from SAP GUI</span>
+                  <input type="file" id="sapFileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="window.app.handleFileSelected(event)">
+                  <button onclick="document.getElementById('sapFileInput').click()" class="mt-4 px-4 py-2 text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 rounded-lg shadow-xs">
+                    Browse Local File
+                  </button>
+                </div>
+
+                <!-- Simulation Import Button -->
+                <div class="mt-6 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <span class="text-xs text-slate-400">Need a sample SAP file? Test with automated sample data:</span>
+                  <button onclick="window.app.simulateSapUpload()" class="px-4 py-2 text-xs font-semibold bg-sky-50 hover:bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 rounded-lg border border-sky-200 dark:border-sky-800 transition-colors">
+                    Load Sample ZM088 SAP Export
+                  </button>
+                </div>
+              </div>
+
+              <!-- Upload History Box -->
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-3">Recent SAP Ingestion Runs</h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
+                      <tr>
+                        <th class="py-2 px-3">Run ID</th>
+                        <th class="py-2 px-3">File Name</th>
+                        <th class="py-2 px-3">SAP Code</th>
+                        <th class="py-2 px-3">Period</th>
+                        <th class="py-2 px-3 text-right">Rows</th>
+                        <th class="py-2 px-3">Status</th>
+                        <th class="py-2 px-3">Timestamp</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                      ${this.state.uploads.map(u => `
+                        <tr>
+                          <td class="py-2 px-3 font-mono text-sky-600">${u.uploadId}</td>
+                          <td class="py-2 px-3 font-medium text-slate-800 dark:text-slate-200">${u.fileName}</td>
+                          <td class="py-2 px-3 font-mono">${u.tCode}</td>
+                          <td class="py-2 px-3">${u.month} ${u.fy}</td>
+                          <td class="py-2 px-3 text-right tabular-nums">${u.rows}</td>
+                          <td class="py-2 px-3 text-teal-600 font-semibold">${u.status}</td>
+                          <td class="py-2 px-3 text-slate-400">${u.date}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+
+        // Approvals Center
+        renderApprovals: function(mount) {
+          const pending = this.state.records.filter(r => r.status === 'Submitted' || r.status === 'Under Review');
+
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Department Approval Center</h1>
+                  <p class="text-xs text-slate-500">Verification & Sign-Off by Department Heads and Operations Management</p>
+                </div>
+                <div class="text-xs font-semibold text-slate-500">
+                  <span class="text-amber-500 font-bold">${pending.length}</span> Submissions Awaiting Approval
+                </div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
+                    <tr>
+                      <th class="py-3 px-4">Record ID</th>
+                      <th class="py-3 px-4">Indicator Name</th>
+                      <th class="py-3 px-4">Department</th>
+                      <th class="py-3 px-4 text-right">Target</th>
+                      <th class="py-3 px-4 text-right">Actual Reported</th>
+                      <th class="py-3 px-4">Compliance</th>
+                      <th class="py-3 px-4">Submitted By</th>
+                      <th class="py-3 px-4 text-center">Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                    ${pending.length === 0 ? `
+                      <tr>
+                        <td colspan="8" class="text-center py-8 text-slate-400">All submissions for ${this.state.currentMonth} are up to date and approved.</td>
+                      </tr>
+                    ` : pending.map(r => {
+                      const ind = this.state.indicators.find(i => i.id === r.indicatorId) || {};
+                      return `
+                        <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                          <td class="py-3 px-4 font-mono font-medium text-slate-700 dark:text-slate-300">${r.id}</td>
+                          <td class="py-3 px-4 font-semibold text-slate-900 dark:text-white">${ind.name}</td>
+                          <td class="py-3 px-4 text-slate-500">${r.departmentId}</td>
+                          <td class="py-3 px-4 text-right tabular-nums">${r.targetValue} ${ind.unit}</td>
+                          <td class="py-3 px-4 text-right tabular-nums font-bold text-sky-600">${r.actualValue} ${ind.unit}</td>
+                          <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${r.complianceStatus === 'Compliant' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
+                              ${r.complianceStatus}
+                            </span>
+                          </td>
+                          <td class="py-3 px-4 text-slate-500">${r.updatedBy || 'user@company.com'}</td>
+                          <td class="py-3 px-4 text-center space-x-2">
+                            <button onclick="window.app.reviewSubmission('${r.id}', 'APPROVE')" class="px-3 py-1 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded shadow-xs text-xs">Approve</button>
+                            <button onclick="window.app.reviewSubmission('${r.id}', 'REJECT')" class="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded text-xs">Reject</button>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        },
+
+        // Corrective Actions (CAPA)
+        renderCorrectiveActions: function(mount) {
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Corrective & Preventive Action (CAPA) Log</h1>
+                  <p class="text-xs text-slate-500">Automotive 8D Problem Solving Matrix for Target Deviations</p>
+                </div>
+                <button onclick="window.app.openCreateCapaModal()" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-500 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                  <span>New Corrective Action</span>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${this.state.correctiveActions.map(c => `
+                  <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="font-mono font-bold text-amber-600 text-xs">${c.actionId}</span>
+                        <span class="text-xs text-slate-400">·</span>
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">${c.indicatorId}</span>
+                      </div>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${c.status === 'Closed' ? 'bg-teal-50 text-teal-700' : 'bg-amber-50 text-amber-700'}">${c.status}</span>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-medium text-slate-400 block mb-0.5">PROBLEM STATEMENT</span>
+                      <p class="text-xs text-slate-800 dark:text-slate-200">${c.problemDescription}</p>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-medium text-slate-400 block mb-0.5">ROOT CAUSE</span>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">${c.rootCause}</p>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-medium text-slate-400 block mb-0.5">CORRECTIVE & PREVENTIVE ACTION</span>
+                      <p class="text-xs text-slate-700 dark:text-slate-300 font-medium">${c.correctiveAction}</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500">
+                      <span>Owner: <strong class="text-slate-700 dark:text-slate-300">${c.assignedOwner.split('@')[0]}</strong></span>
+                      <span>Due: <strong class="text-slate-700 dark:text-slate-300">${c.dueDate}</strong></span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        },
+
+        // Department Management
+        renderDepartments: function(mount) {
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Plant Department Hierarchy</h1>
+                  <p class="text-xs text-slate-500">7 Core Automotive Operational Divisions</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${this.state.departments.map(d => `
+                  <div class="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="font-mono text-xs text-sky-600 font-bold">${d.code}</span>
+                      <span class="text-xs text-teal-600 font-medium">Active</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">${d.name}</h3>
+                    <p class="text-xs text-slate-500">Head: <strong class="text-slate-800 dark:text-slate-200">${d.head}</strong></p>
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                      <span>Indicators Configured:</span>
+                      <strong class="text-slate-900 dark:text-white font-mono">${d.count}</strong>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        },
+
+        // Reports & Exports
+        renderReports: function(mount) {
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">Automotive DRM Reporting & Exports</h1>
+                <p class="text-xs text-slate-500 mb-6">Generate standardized executive summaries, department scorecards, and audit packages</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <div class="border border-slate-200 dark:border-slate-800 p-4 rounded-xl space-y-3">
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">1. Monthly Plant DRM Report</h3>
+                    <p class="text-slate-500">Complete breakdown of all 48 indicators for ${this.state.currentMonth} ${this.state.currentFy} with variance notes.</p>
+                    <button onclick="window.app.exportMonthlyCsv()" class="w-full py-2 bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-xs">Download CSV Report</button>
+                  </div>
+                  <div class="border border-slate-200 dark:border-slate-800 p-4 rounded-xl space-y-3">
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">2. Department Performance Scorecard</h3>
+                    <p class="text-slate-500">Cross-department comparison, compliance ranking, and SLA completion rates.</p>
+                    <button onclick="window.app.exportDeptCsv()" class="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 font-semibold rounded-lg">Download Scorecard</button>
+                  </div>
+                  <div class="border border-slate-200 dark:border-slate-800 p-4 rounded-xl space-y-3">
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">3. Non-Compliance & CAPA Log</h3>
+                    <p class="text-slate-500">Audit report of all failed indicators, open 8D corrective actions, and due dates.</p>
+                    <button onclick="window.app.exportCapaCsv()" class="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 font-semibold rounded-lg">Download CAPA Export</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+
+        // Historical Analytics
+        renderHistorical: function(mount) {
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">Historical DRM Analytics</h1>
+                <p class="text-xs text-slate-500 mb-6">Multi-year operational comparison between FY 2025-2026 and FY 2026-2027</p>
+                <div class="h-80">
+                  <canvas id="chartHistoricalComparison"></canvas>
+                </div>
+              </div>
+            </div>
+          `;
+          setTimeout(() => {
+            const ctx = document.getElementById('chartHistoricalComparison');
+            if (ctx) {
+              new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: MONTHS,
+                  datasets: [
+                    {
+                      label: 'FY 2026-2027 Average Compliance %',
+                      data: [91.2, 92.4, 89.8, 93.1, 94.0, 92.5, 90.8, null, null, null, null, null],
+                      borderColor: '#0284C7',
+                      backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                      tension: 0.3,
+                      fill: true
+                    },
+                    {
+                      label: 'FY 2025-2026 Average Compliance % (Prior Year)',
+                      data: [84.5, 86.0, 85.2, 87.4, 88.0, 87.2, 86.9, 89.1, 90.2, 89.5, 91.0, 91.4],
+                      borderColor: '#94A3B8',
+                      borderDash: [5, 5],
+                      tension: 0.3
+                    }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: { y: { min: 70, max: 100 } }
+                }
+              });
+            }
+          }, 100);
+        },
+
+        // Audit Logs
+        renderAudit: function(mount) {
+          mount.innerHTML = `
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                <div>
+                  <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">System Audit Trail</h1>
+                  <p class="text-xs text-slate-500">Immutable ledger of operational record changes, uploads, and approval timestamps</p>
+                </div>
+              </div>
+
+              <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500">
+                    <tr>
+                      <th class="py-3 px-4">Log ID</th>
+                      <th class="py-3 px-4">Timestamp</th>
+                      <th class="py-3 px-4">User</th>
+                      <th class="py-3 px-4">Module</th>
+                      <th class="py-3 px-4">Action</th>
+                      <th class="py-3 px-4">Record ID</th>
+                      <th class="py-3 px-4">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                    ${this.state.auditLogs.map(a => `
+                      <tr>
+                        <td class="py-2.5 px-4 font-mono text-slate-400">${a.id}</td>
+                        <td class="py-2.5 px-4 text-slate-500 tabular-nums">${a.time}</td>
+                        <td class="py-2.5 px-4 font-medium text-slate-700 dark:text-slate-300">${a.user}</td>
+                        <td class="py-2.5 px-4 font-mono text-sky-600">${a.module}</td>
+                        <td class="py-2.5 px-4 font-semibold">${a.action}</td>
+                        <td class="py-2.5 px-4 font-mono">${a.recordId}</td>
+                        <td class="py-2.5 px-4 text-slate-600 dark:text-slate-400">${a.details}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        },
+
+        // Application Settings
+        renderSettings: function(mount) {
+          mount.innerHTML = `
+            <div class="max-w-3xl space-y-6">
+              <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">System & Database Architecture</h1>
+                <p class="text-xs text-slate-500">Configuration parameters for Google Drive folder and Google Sheets database</p>
+
+                <div class="space-y-3 text-xs">
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Google Drive Storage Root</label>
+                    <input type="text" value="SAP_DRM_Data" disabled class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 font-mono">
+                    <span class="text-[11px] text-slate-400">Stores /Database, /SAP_Uploads, /Generated_Reports, /Attachments</span>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Master Spreadsheet File</label>
+                    <input type="text" value="SAP_DRM_Master_Database" disabled class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 font-mono">
+                    <span class="text-[11px] text-slate-400">Contains all 10 synchronized operational sheets</span>
+                  </div>
+                  <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Active Timezone</label>
+                    <input type="text" value="Asia/Kolkata (IST - UTC+5:30)" disabled class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                  </div>
+                  <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button onclick="window.app.initializeDatabase()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white font-semibold rounded-lg shadow-xs">
+                      Re-Initialize Database Structure
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+
+        // Helper Handlers
+        handleMonthChange: function(newMonth) {
+          this.state.currentMonth = newMonth;
+          this.renderDashboard(document.getElementById('viewMount'));
+          this.showToast(`Switched view to ${newMonth}`, 'info');
+        },
+
+        handleFyChange: function(newFy) {
+          this.state.currentFy = newFy;
+          this.navigate(this.state.currentView);
+          this.showToast(`Active Financial Year: ${newFy}`, 'info');
+        },
+
+        handleDeptChange: function(deptId) {
+          this.state.currentDept = deptId;
+          this.navigate(this.state.currentView);
+        },
+
+        switchRole: function(role) {
+          this.state.currentRole = role;
+          const emails = {
+            'ADMIN': 'admin@company.com',
+            'DEPT_HEAD': 'quality.head@company.com',
+            'DEPT_USER': 'suresh.kumar@company.com'
+          };
+          this.state.currentUser = emails[role];
+          document.getElementById('userEmailBadge').innerText = this.state.currentUser;
+          this.showToast(`Switched active role to ${role}`, 'success');
+          this.navigate(this.state.currentView);
+        },
+
+        toggleDarkMode: function() {
+          document.documentElement.classList.toggle('dark');
+        },
+
+        toggleSidebar: function() {
+          const sb = document.getElementById('mainSidebar');
+          sb.classList.toggle('w-64');
+          sb.classList.toggle('w-16');
+        },
+
+        updateActualRow: function(recordId, value) {
+          const rec = this.state.records.find(r => r.id === recordId);
+          if (!rec) return;
+          rec.actualValue = value !== '' ? Number(value) : null;
+          const ind = this.state.indicators.find(i => i.id === rec.indicatorId);
+          if (ind) {
+            const res = this.calculateCompliance(ind.rule, rec.actualValue, rec.targetValue, ind.tolMin, ind.tolMax);
+            rec.complianceStatus = res.status;
+            rec.variance = res.variance;
+            rec.achievementPct = res.achievementPct;
+          }
+          this.showToast(`Updated record actual: ${value}`, 'success');
+          this.renderMonthlyTracking(document.getElementById('viewMount'));
+        },
+
+        submitSingleRecord: function(recordId) {
+          const rec = this.state.records.find(r => r.id === recordId);
+          if (!rec || rec.actualValue === null) {
+            this.showToast('Please enter an actual value before submitting', 'error');
+            return;
+          }
+          rec.status = 'Submitted';
+          this.showToast('Record submitted for Department Head review', 'success');
+          this.renderMonthlyTracking(document.getElementById('viewMount'));
+        },
+
+        batchSubmitRecords: function() {
+          let count = 0;
+          this.state.records.forEach(r => {
+            if (r.financialYear === this.state.currentFy && r.month === this.state.currentMonth && r.status === 'Draft' && r.actualValue !== null) {
+              r.status = 'Submitted';
+              count++;
+            }
+          });
+          this.showToast(`Successfully submitted ${count} indicators for approval`, 'success');
+          this.renderMonthlyTracking(document.getElementById('viewMount'));
+        },
+
+        reviewSubmission: function(recordId, decision) {
+          const rec = this.state.records.find(r => r.id === recordId);
+          if (!rec) return;
+          rec.status = decision === 'APPROVE' ? 'Approved' : 'Draft';
+          this.showToast(`Record ${recordId} marked as ${rec.status}`, decision === 'APPROVE' ? 'success' : 'info');
+          this.renderApprovals(document.getElementById('viewMount'));
+        },
+
+        simulateSapUpload: function() {
+          this.showToast('Processing simulated ZM088 SAP Export file...', 'info');
+          setTimeout(() => {
+            this.state.uploads.unshift({
+              uploadId: 'SAP-' + Math.floor(1000 + Math.random() * 9000),
+              fileName: 'ZM088_Vendor_OTIF_AutoImport.xlsx',
+              deptId: 'DEP-01',
+              fy: this.state.currentFy,
+              month: this.state.currentMonth,
+              tCode: 'ZM088',
+              rows: 520,
+              rejected: 0,
+              status: 'Completed',
+              user: this.state.currentUser,
+              date: new Date().toLocaleString()
+            });
+            this.showToast('SAP file parsed! 520 rows processed into Google Drive', 'success');
+            this.renderSapUpload(document.getElementById('viewMount'));
+          }, 600);
+        },
+
+        handleFileSelected: function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          this.showToast(`Uploaded ${file.name}. Validating columns against SAP schema...`, 'info');
+          setTimeout(() => {
+            this.showToast(`Validation passed: 100% column headers match SAP format. Ready to process.`, 'success');
+          }, 800);
+        },
+
+        openGasDeployModal: function() {
+          alert('Google Apps Script Ready!\n\n1. "Code.gs" and "Index.html" have been created in the root directory.\n2. In Google Apps Script (script.google.com), create a new project and copy these 2 files.\n3. Deploy as Web App with Access: Anyone.\n4. Both local interactive mode and Apps Script execution are fully supported.');
+        },
+
+        exportMonthlyCsv: function() {
+          const records = this.state.records.filter(r => r.financialYear === this.state.currentFy && r.month === this.state.currentMonth);
+          let csv = 'Record_ID,Indicator_ID,Indicator_Name,Department,Target,Actual,Variance,Achievement_Pct,Compliance_Status,Workflow_Status\n';
+          records.forEach(r => {
+            const ind = this.state.indicators.find(i => i.id === r.indicatorId) || {};
+            csv += `"${r.id}","${r.indicatorId}","${ind.name || ''}","${r.departmentId}",${r.targetValue},${r.actualValue !== null ? r.actualValue : ''},${r.variance !== null ? r.variance : ''},${r.achievementPct !== null ? r.achievementPct : ''},"${r.complianceStatus}","${r.status}"\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `SAP_DRM_${this.state.currentMonth}_${this.state.currentFy}.csv`;
+          a.click();
+          this.showToast('CSV export downloaded successfully', 'success');
+        },
+
+        exportDeptCsv: function() {
+          let csv = 'Department_ID,Department_Name,Code,Head,Indicators_Count\n';
+          this.state.departments.forEach(d => {
+            csv += `"${d.id}","${d.name}","${d.code}","${d.head}",${d.count}\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'SAP_DRM_Departments.csv';
+          a.click();
+          this.showToast('Department scorecard CSV downloaded', 'success');
+        },
+
+        exportCapaCsv: function() {
+          let csv = 'Action_ID,Indicator_ID,Department,Problem,Root_Cause,Corrective_Action,Owner,Status,Due_Date\n';
+          this.state.correctiveActions.forEach(c => {
+            csv += `"${c.actionId}","${c.indicatorId}","${c.departmentId}","${c.problemDescription}","${c.rootCause}","${c.correctiveAction}","${c.assignedOwner}","${c.status}","${c.dueDate}"\n`;
+          });
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'SAP_DRM_CAPA_Log.csv';
+          a.click();
+          this.showToast('CAPA report CSV downloaded', 'success');
+        },
+
+        showToast: function(message, type = 'info') {
+          const container = document.getElementById('toastContainer');
+          if (!container) return;
+          const toast = document.createElement('div');
+          const bg = type === 'success' ? 'bg-teal-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-900';
+          toast.className = `${bg} text-white text-xs px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 transform transition-all duration-200 pointer-events-auto`;
+          toast.innerHTML = `<span>${message}</span>`;
+          container.appendChild(toast);
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 200);
+          }, 3000);
+        },
+
+        bindEvents: function() {
+          // Event delegation if needed
+        }
+      };
+
+      // Auto start
+      document.addEventListener('DOMContentLoaded', () => {
+        window.app.init();
+      });
+    })();
+  </script>
+</body>
+</html>

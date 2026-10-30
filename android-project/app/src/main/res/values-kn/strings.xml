@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartPay ಸೌಂಡ್ ಬಾಕ್ಸ್</string>
+    <string name="nav_home">ಮುಖಪುಟ</string>
+    <string name="nav_history">ಇತಿಹಾಸ</string>
+    <string name="nav_settings">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+    <string name="today_detected_total">ಇಂದಿನ ಪತ್ತೆಯಾದ ಒಟ್ಟು</string>
+    <string name="this_month_total">ಈ ತಿಂಗಳು</string>
+    <string name="sound_announcement_lang">ಧ್ವನಿ ಭಾಷೆ</string>
+    <string name="recent_transactions_title">ಇತ್ತೀಚಿನ ಪಾವತಿಗಳು</string>
+    <string name="status_detected_not_bank_verified">ಪತ್ತೆಯಾಗಿದೆ — ಬ್ಯಾಂಕ್ ಪರಿಶೀಲಿಸಿಲ್ಲ</string>
+    <string name="btn_test_sound">ಧ್ವನಿ ಪರೀಕ್ಷಿಸಿ</string>
+    <string name="btn_sample_demo">ಮಾದರಿ ವ್ಯವಹಾರ ಸೇರಿಸಿ</string>
+</resources>
